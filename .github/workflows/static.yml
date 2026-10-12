@@ -1,0 +1,50 @@
+# Publie le site (build Vite) sur GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Se déclenche à chaque push sur la branche main
+  push:
+    branches: ["main"]
+
+  # Permet de lancer le déploiement à la main depuis l'onglet Actions
+  workflow_dispatch:
+
+# Autorisations nécessaires au déploiement sur GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois ; on laisse les déploiements en cours se terminer
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # On publie le résultat du build, pas les sources
+          path: "./dist"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
