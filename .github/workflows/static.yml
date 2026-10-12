@@ -40,6 +40,9 @@ jobs:
         run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Active le site Pages automatiquement s'il ne l'est pas encore sur le dépôt
+          enablement: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
